@@ -35,9 +35,7 @@ void setup() {
   pinMode(sikakuButton, INPUT_PULLDOWN);
   pinMode(sankakuButton, INPUT_PULLDOWN);
 
-  Wire1.setSDA(PIN_WIRE0_SDA);
-  Wire1.setSCL(PIN_WIRE0_SCL);
-  if (!cap.begin(0x5A, &Wire1)) {
+  if (!cap.begin(0x5A, &Wire)) {
     digitalWrite(PIN_LED_R, 0);
 
     while (1) {
