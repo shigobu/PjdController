@@ -1,0 +1,6 @@
+{
+    "configuration": "flash=2097152_0,freq=125,opt=Small,rtti=Disabled,dbgport=Disabled,dbglvl=None,usbstack=tinyusb",
+    "board": "rp2040:rp2040:seeed_xiao_rp2040",
+    "sketch": "pjdController.ino",
+    "port": "COM1"
+}
