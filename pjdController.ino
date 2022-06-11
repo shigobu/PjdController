@@ -2,16 +2,14 @@
 #include <stdlib.h>
 
 #include "Adafruit_MPR121.h"
-#include "XInputPad.h"
-#include "tusb.h"
+#include "Adafruit_TinyUSB.h"
 
-extern "C" {
-void sendReportData(void);
-}
 const int maruButton = 1;
 const int batuButton = 2;
 const int sikakuButton = 4;
 const int sankakuButton = 3;
+const int l = D0;
+const int r = D1;
 
 Adafruit_MPR121 cap = Adafruit_MPR121();
 uint16_t lasttouched = 0;
@@ -19,8 +17,31 @@ uint16_t currtouched = 0;
 int8_t startTouchedPosition = 0;
 int8_t currTouchedPosition = 0;
 
+// HID report descriptor using TinyUSB's template
+// Single Report (no ID) descriptor
+uint8_t const desc_hid_report[] = {TUD_HID_REPORT_DESC_GAMEPAD()};
+
+// USB HID object. For ESP32 these values cannot be changed after this
+// declaration desc report, desc len, protocol, interval, use out endpoint
+Adafruit_USBD_HID usb_hid(desc_hid_report, sizeof(desc_hid_report),
+                          HID_ITF_PROTOCOL_NONE, 2, false);
+
+// Report payload defined in src/class/hid/hid.h
+// - For Gamepad Button Bit Mask see  hid_gamepad_button_bm_t
+// - For Gamepad Hat    Bit Mask see  hid_gamepad_hat_t
+hid_gamepad_report_t gp;
+
 void setup() {
-  tusb_init();
+#if defined(ARDUINO_ARCH_MBED) && defined(ARDUINO_ARCH_RP2040)
+  // Manual begin() is required on core without built-in support for TinyUSB
+  // such as mbed rp2040
+  TinyUSB_Device_Init(0);
+#endif
+
+  usb_hid.begin();
+
+  // wait until device mounted
+  while (!TinyUSBDevice.mounted()) delay(1);
 
   pinMode(PIN_LED_R, OUTPUT);
   pinMode(PIN_LED_G, OUTPUT);
@@ -34,6 +55,8 @@ void setup() {
   pinMode(batuButton, INPUT_PULLDOWN);
   pinMode(sikakuButton, INPUT_PULLDOWN);
   pinMode(sankakuButton, INPUT_PULLDOWN);
+  pinMode(l, INPUT_PULLDOWN);
+  pinMode(r, INPUT_PULLDOWN);
 
   if (!cap.begin(0x5A, &Wire)) {
     digitalWrite(PIN_LED_R, 0);
@@ -46,17 +69,28 @@ void setup() {
 }
 
 void loop() {
-  XboxButtonData.digital_buttons_2 = 0;
-  XboxButtonData.digital_buttons_1 = 0;
+  if (!usb_hid.ready()) return;
 
-  XboxButtonData.digital_buttons_2 += (uint)digitalRead(maruButton) << 5;
-  XboxButtonData.digital_buttons_2 += (uint)digitalRead(batuButton) << 4;
-  XboxButtonData.digital_buttons_2 += (uint)digitalRead(sikakuButton) << 6;
-  XboxButtonData.digital_buttons_2 += (uint)digitalRead(sankakuButton) << 7;
+  // Reset buttons
+  gp.x = 0;
+  gp.y = 0;
+  gp.z = 0;
+  gp.rz = 0;
+  gp.rx = 0;
+  gp.ry = 0;
+  gp.hat = 0;
+  gp.buttons = 0;
+
+  gp.buttons += (uint)digitalRead(maruButton) << 1;
+  gp.buttons += (uint)digitalRead(batuButton) << 0;
+  gp.buttons += (uint)digitalRead(sikakuButton) << 2;
+  gp.buttons += (uint)digitalRead(sankakuButton) << 3;
+  gp.buttons += (uint)digitalRead(l) << 4;
+  gp.buttons += (uint)digitalRead(r) << 5;
 
   slideBar();
-  sendReportData();
-  tud_task();  // tinyusb device task
+
+  usb_hid.sendReport(0, &gp, sizeof(gp));
 }
 
 void slideBar() {
@@ -74,16 +108,16 @@ void slideBar() {
     //離れている
     startTouchedPosition = 0;
     currTouchedPosition = 0;
-    XboxButtonData.l_x = 0;
+    gp.x = 0;
   } else if (lasttouched == 0 && currtouched != 0) {
     //触れたとき
     startTouchedPosition = makeTouchedPosition(currtouched);
-    XboxButtonData.l_x = 0;
+    gp.x = 0;
   } else if (lasttouched != 0 && currtouched == 0) {
     //離れたとき
     startTouchedPosition = 0;
     currTouchedPosition = 0;
-    XboxButtonData.l_x = 0;
+    gp.x = 0;
   } else if (lasttouched != 0 && currtouched != 0) {
     //触れている途中
     currTouchedPosition = makeTouchedPosition(currtouched);
@@ -93,7 +127,7 @@ void slideBar() {
     } else if (dist < -3) {
       dist = -3;
     }
-    XboxButtonData.l_x = dist * 10000;
+    gp.x = dist * 42;
   }
 
   lasttouched = currtouched;
