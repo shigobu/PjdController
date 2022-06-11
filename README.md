@@ -36,4 +36,6 @@ pjdController.ino の有るフォルダで右クリック→「Codeで開く」�
 # 配線
 各スイッチは、デジタルピンとグランドの間に配置します。D7からD10とD0に各スイッチの片方を接続し、反対側をグランドに接続します。Steamの機能でボタンの配置を設定するので、どこにどのボタンを接続しても構いません。
 
-12-Key Capacitive Touch Sensor Breakout と Seeed XIAO RP2040 の SDA と SCL をそれぞれ接続します。Touch Sensor の VIN と XIAO RP2040 の 3V3 を、Touch Sensor の GND と XIAO RP2040 の GND を接続します。
+12-Key Capacitive Touch Sensor Breakout と Seeed XIAO RP2040 の SDA と SCL をそれぞれ接続します。Touch Sensor Breakout の VIN と XIAO RP2040 の 3V3 を、Touch Sensor Breakout の GND と XIAO RP2040 の GND を接続します。
+
+タッチセンサである銅箔テープは、左が Touch Sensor Breakout の 0、右が 11 になるように接続します。
