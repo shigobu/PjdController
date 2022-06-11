@@ -8,8 +8,7 @@ const int maruButton = 1;
 const int batuButton = 2;
 const int sikakuButton = 4;
 const int sankakuButton = 3;
-const int l = D0;
-const int r = D1;
+const int ly = D0;
 
 Adafruit_MPR121 cap = Adafruit_MPR121();
 uint16_t lasttouched = 0;
@@ -32,6 +31,8 @@ Adafruit_USBD_HID usb_hid(desc_hid_report, sizeof(desc_hid_report),
 hid_gamepad_report_t gp;
 
 void setup() {
+  Serial.begin(115200);
+
 #if defined(ARDUINO_ARCH_MBED) && defined(ARDUINO_ARCH_RP2040)
   // Manual begin() is required on core without built-in support for TinyUSB
   // such as mbed rp2040
@@ -51,12 +52,11 @@ void setup() {
   digitalWrite(PIN_LED_G, 1);
   digitalWrite(PIN_LED_B, 1);
 
-  pinMode(maruButton, INPUT_PULLDOWN);
-  pinMode(batuButton, INPUT_PULLDOWN);
-  pinMode(sikakuButton, INPUT_PULLDOWN);
-  pinMode(sankakuButton, INPUT_PULLDOWN);
-  pinMode(l, INPUT_PULLDOWN);
-  pinMode(r, INPUT_PULLDOWN);
+  pinMode(maruButton, INPUT_PULLUP);
+  pinMode(batuButton, INPUT_PULLUP);
+  pinMode(sikakuButton, INPUT_PULLUP);
+  pinMode(sankakuButton, INPUT_PULLUP);
+  pinMode(ly, INPUT_PULLUP);
 
   if (!cap.begin(0x5A, &Wire)) {
     digitalWrite(PIN_LED_R, 0);
@@ -81,12 +81,11 @@ void loop() {
   gp.hat = 0;
   gp.buttons = 0;
 
-  gp.buttons += (uint)digitalRead(maruButton) << 1;
-  gp.buttons += (uint)digitalRead(batuButton) << 0;
-  gp.buttons += (uint)digitalRead(sikakuButton) << 2;
-  gp.buttons += (uint)digitalRead(sankakuButton) << 3;
-  gp.buttons += (uint)digitalRead(l) << 4;
-  gp.buttons += (uint)digitalRead(r) << 5;
+  gp.buttons += !(uint)digitalRead(maruButton) << 1;
+  gp.buttons += !(uint)digitalRead(batuButton) << 0;
+  gp.buttons += !(uint)digitalRead(sikakuButton) << 2;
+  gp.buttons += !(uint)digitalRead(sankakuButton) << 3;
+  gp.buttons += !(uint)digitalRead(ly) << 4;
 
   slideBar();
 
