@@ -8,6 +8,9 @@ RP2040 を搭載したボードで、Arduino-Picoでサポートされている�
 * 銅箔テープ
 * ゲームスイッチ 4個
 * タクトスイッチ 1個
+* その他、ブレッドボードや配線材
+
+partscabi.netにまとめています。 [partscabi.net](https://partscabi.net/list/a633d7ea-ac57-4b9a-8670-2d2e5a3435d6)
 
 # 環境構築
 Visual Studio Code(VS Code) のArduino 拡張機能を使用しています。ボードの設定が保存されているので、VS Codeで開くと、ボード設定が復元されます。Arduino IDEも使えます。Arduino IDEは、ボード設定が保存されない(前回の設定を覚えているだけ)ので、ビルドするときに「ツール」→「ボード」の設定を確認してください。
