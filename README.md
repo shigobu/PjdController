@@ -39,3 +39,5 @@ pjdController.ino の有るフォルダで右クリック→「Codeで開く」�
 12-Key Capacitive Touch Sensor Breakout と Seeed XIAO RP2040 の SDA と SCL をそれぞれ接続します。Touch Sensor Breakout の VIN と XIAO RP2040 の 3V3 を、Touch Sensor Breakout の GND と XIAO RP2040 の GND を接続します。
 
 タッチセンサである銅箔テープは、左が Touch Sensor Breakout の 0、右が 11 になるように接続します。
+
+![配線図](docs/pjdControllerHID.png)
