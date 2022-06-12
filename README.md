@@ -1,5 +1,5 @@
 # PjdController
-Seeed XIAO RP2040 で 初音ミク Project DIVA MEGA39’s＋ 用アーケードコントローラー を作るためのコード。
+Seeed XIAO RP2040 で 初音ミク Project DIVA MEGA39’s＋ 用アーケードコントローラー を作るためのコード。スライドの同時押しには未対応。
 RP2040 を搭載したボードで、Arduino-Picoでサポートされているものは、ちょっとコードを変更すれば動くはず。
 
 # 遅延
